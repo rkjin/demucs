@@ -21,7 +21,7 @@ from .compressed import get_compressed_datasets
 from .model import Demucs
 from .parser import get_name, get_parser
 from .raw import Rawset
-from .repitch import RepitchedWrapper
+from .repitch import RepitchedWrapper, repitch
 from .pretrained import load_pretrained, SOURCES
 from .tasnet import ConvTasNet
 from .test import evaluate
@@ -45,20 +45,20 @@ def main():
     name = get_name(parser, args)
     print(f"Experiment {name}")
 
-    if args.musdb is None and args.rank == 0:
+    if args.musdb is None and args.rank == 0: #False
         print(
             "You must provide the path to the MusDB dataset with the --musdb flag. "
             "To download the MusDB dataset, see https://sigsep.github.io/datasets/musdb.html.",
             file=sys.stderr)
         sys.exit(1)
 
-    eval_folder = args.evals / name
+    eval_folder = args.evals / name  # evals/musdb=musdb18 batch_size=1 # evals # musdb=musdb18 batch_size=1 #
     eval_folder.mkdir(exist_ok=True, parents=True)
-    args.logs.mkdir(exist_ok=True)
-    metrics_path = args.logs / f"{name}.json"
+    args.logs.mkdir(exist_ok=True) #logs
+    metrics_path = args.logs / f"{name}.json" #logs/musdb=musdb18 batch_size=1.json
     eval_folder.mkdir(exist_ok=True, parents=True)
-    args.checkpoints.mkdir(exist_ok=True, parents=True)
-    args.models.mkdir(exist_ok=True, parents=True)
+    args.checkpoints.mkdir(exist_ok=True, parents=True) #checkpoints
+    args.models.mkdir(exist_ok=True, parents=True) #models
 
     if args.device is None:
         device = "cpu"
@@ -73,7 +73,7 @@ def main():
     os.environ["OMP_NUM_THREADS"] = "1"
     os.environ["MKL_NUM_THREADS"] = "1"
 
-    if args.world_size > 1:
+    if args.world_size > 1: #Fasle
         if device != "cuda" and args.rank == 0:
             print("Error: distributed training is only available with cuda device", file=sys.stderr)
             sys.exit(1)
@@ -88,14 +88,14 @@ def main():
     if args.restart and checkpoint.exists() and args.rank == 0:
         checkpoint.unlink()
 
-    if args.test or args.test_pretrained:
+    if args.test or args.test_pretrained: #None, None
         args.epochs = 1
         args.repeat = 0
         if args.test:
             model = load_model(args.models / args.test)
         else:
             model = load_pretrained(args.test_pretrained)
-    elif args.tasnet:
+    elif args.tasnet: #False
         model = ConvTasNet(audio_channels=args.audio_channels,
                            samplerate=args.samplerate, X=args.X,
                            segment_length=4 * args.samples,
@@ -120,16 +120,16 @@ def main():
             sources=SOURCES,
         )
     model.to(device)
-    if args.init:
+    if args.init: #None
         model.load_state_dict(load_pretrained(args.init).state_dict())
 
-    if args.show:
+    if args.show: #Fasle
         print(model)
         size = sizeof_fmt(4 * sum(p.numel() for p in model.parameters()))
         print(f"Model size {size}")
         return
 
-    try:
+    try: #checkpoints/musdb=musdb18 batch_size=1.th
         saved = th.load(checkpoint, map_location='cpu')
     except IOError:
         saved = SavedState()
@@ -139,20 +139,21 @@ def main():
     quantizer = None
     quantizer = get_quantizer(model, args, optimizer)
 
-    if saved.last_state is not None:
+    if saved.last_state is not None: #None
         model.load_state_dict(saved.last_state, strict=False)
-    if saved.optimizer is not None:
+    if saved.optimizer is not None: #None
         optimizer.load_state_dict(saved.optimizer)
 
-    model_name = f"{name}.th"
-    if args.save_model:
+    model_name = f"{name}.th" #musdb=musdb18 batch_size=1.th
+
+    if args.save_model: # Fasle
         if args.rank == 0:
             model.to("cpu")
             assert saved.best_state is not None, "model needs to train for 1 epoch at least."
             model.load_state_dict(saved.best_state)
             save_model(model, quantizer, args, args.models / model_name)
         return
-    elif args.save_state:
+    elif args.save_state: # None
         model_name = f"{args.save_state}.th"
         if args.rank == 0:
             model.to("cpu")
@@ -161,19 +162,20 @@ def main():
             save_state(state, args.models / model_name)
         return
 
-    if args.rank == 0:
+    if args.rank == 0: #True
         done = args.logs / f"{name}.done"
         if done.exists():
             done.unlink()
 
     augment = [Shift(args.data_stride)]
-    if args.augment:
+    if args.augment: #True
         augment += [FlipSign(), FlipChannels(), Scale(),
                     Remix(group_size=args.remix_group_size)]
     augment = nn.Sequential(*augment).to(device)
     print("Agumentation pipeline:", augment)
 
-    if args.mse:
+    print(args.mse, args.repitch, args.raw,args.wav,args.concat, args.is_wav, args.repitch)
+    if args.mse: # False
         criterion = nn.MSELoss()
     else:
         criterion = nn.L1Loss()
@@ -184,13 +186,13 @@ def main():
     samples = model.valid_length(args.samples)
     print(f"Number of training samples adjusted to {samples}")
     samples = samples + args.data_stride
-    if args.repitch:
+    if args.repitch: #0.2
         # We need a bit more audio samples, to account for potential
         # tempo change.
         samples = math.ceil(samples / (1 - 0.01 * args.max_tempo))
 
     args.metadata.mkdir(exist_ok=True, parents=True)
-    if args.raw:
+    if args.raw: #None
         train_set = Rawset(args.raw / "train",
                            samples=samples,
                            channels=args.audio_channels,
@@ -198,23 +200,23 @@ def main():
                            stride=args.data_stride)
 
         valid_set = Rawset(args.raw / "valid", channels=args.audio_channels)
-    elif args.wav:
+    elif args.wav: #None
         train_set, valid_set = get_wav_datasets(args, samples, model.sources)
 
-        if args.concat:
-            if args.is_wav:
+        if args.concat: #False
+            if args.is_wav: 
                 mus_train, mus_valid = get_musdb_wav_datasets(args, samples, model.sources)
             else:
                 mus_train, mus_valid = get_compressed_datasets(args, samples)
             train_set = ConcatDataset([train_set, mus_train])
             valid_set = ConcatDataset([valid_set, mus_valid])
-    elif args.is_wav:
+    elif args.is_wav: # False
         train_set, valid_set = get_musdb_wav_datasets(args, samples, model.sources)
     else:
         train_set, valid_set = get_compressed_datasets(args, samples)
     print("Train set and valid set sizes", len(train_set), len(valid_set))
 
-    if args.repitch:
+    if args.repitch: #0.2
         train_set = RepitchedWrapper(
             train_set,
             proba=args.repitch,
