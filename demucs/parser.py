@@ -26,7 +26,7 @@ def get_parser():
     parser.add_argument("-m",
                         "--musdb",
                         type=Path,
-                        default=default_musdb,
+                        default="/home/bj/data/dnn/cfnet_venv/music_data/musdb18",
                         help="Path to musdb root")
     parser.add_argument("--is_wav", action="store_true",
                         help="Indicate that the MusDB dataset is in wav format (i.e. MusDB-HQ).")
