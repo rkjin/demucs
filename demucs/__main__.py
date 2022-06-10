@@ -60,7 +60,7 @@ def main():
     args.checkpoints.mkdir(exist_ok=True, parents=True) #checkpoints
     args.models.mkdir(exist_ok=True, parents=True) #models
 
-    if args.device is None:
+    if args.device is None: # None
         device = "cpu"
         if th.cuda.is_available():
             device = "cuda"
@@ -167,30 +167,29 @@ def main():
         if done.exists():
             done.unlink()
 
-    augment = [Shift(args.data_stride)]
+    augment = [Shift(args.data_stride)] # args.data_stride 44100
     if args.augment: #True
         augment += [FlipSign(), FlipChannels(), Scale(),
                     Remix(group_size=args.remix_group_size)]
     augment = nn.Sequential(*augment).to(device)
     print("Agumentation pipeline:", augment)
 
-    print(args.mse, args.repitch, args.raw,args.wav,args.concat, args.is_wav, args.repitch)
     if args.mse: # False
         criterion = nn.MSELoss()
     else:
-        criterion = nn.L1Loss()
+        criterion = nn.L1Loss() 
 
     # Setting number of samples so that all convolution windows are full.
     # Prevents hard to debug mistake with the prediction being shifted compared
     # to the input mixture.
-    samples = model.valid_length(args.samples)
+ 
+    samples = model.valid_length(args.samples) # 441000 -> 447146
     print(f"Number of training samples adjusted to {samples}")
-    samples = samples + args.data_stride
+    samples = samples + args.data_stride # 447146 + 44100 -> 491246
     if args.repitch: #0.2
         # We need a bit more audio samples, to account for potential
         # tempo change.
-        samples = math.ceil(samples / (1 - 0.01 * args.max_tempo))
-
+        samples = math.ceil(samples / (1 - 0.01 * args.max_tempo)) # 491246 /(0.88) -> 558235
     args.metadata.mkdir(exist_ok=True, parents=True)
     if args.raw: #None
         train_set = Rawset(args.raw / "train",

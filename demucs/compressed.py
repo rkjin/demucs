@@ -14,7 +14,7 @@ from torch import distributed
 from .audio import AudioFile
 
 
-def get_musdb_tracks(root, *args, **kwargs):
+def get_musdb_tracks(root, *args, **kwargs): # /home/bj/data/dnn/cfnet_venv/music_data/musdb18, "", ""
     mus = musdb.DB(root, *args, **kwargs)
     return {track.name: track.path for track in mus}
 
@@ -93,8 +93,8 @@ def _build_musdb_metadata(path, musdb, workers):
 
 
 def get_compressed_datasets(args, samples):
-    metadata_file = args.metadata / "musdb.json"
-    if not metadata_file.is_file() and args.rank == 0:
+    metadata_file = args.metadata / "musdb.json" #metadata/musdb.json
+    if not metadata_file.is_file() and args.rank == 0: # True
         _build_musdb_metadata(metadata_file, args.musdb, args.workers)
     if args.world_size > 1:
         distributed.barrier()

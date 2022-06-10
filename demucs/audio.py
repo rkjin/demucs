@@ -96,12 +96,21 @@ class AudioFile:
 
 
         """
-        streams = np.array(range(len(self)))[streams]
+        # print(self )
+        # AudioFile(path=/home/bj/data/dnn/cfnet_venv/music_data/musdb18/train/A Classic Education - NightOwl.stem.mp4, samplerate=44100, channels=2, streams=5) 
+        # AudioFile(path=/home/bj/data/dnn/cfnet_venv/music_data/musdb18/train/Actions - South Of The Water.stem.mp4, samplerate=44100, channels=2, streams=5) 
+        # AudioFile(path=/home/bj/data/dnn/cfnet_venv/music_data/musdb18/train/Actions - Devil's Words.stem.mp4, samplerate=44100, channels=2, streams=5) 
+        # AudioFile(path=/home/bj/data/dnn/cfnet_venv/music_data/musdb18/test/Al James - Schoolboy Facination.stem.mp4, samplerate=44100, channels=2, streams=5) 
+        # AudioFile(path=/home/bj/data/dnn/cfnet_venv/music_data/musdb18/test/Angels In Amplifiers - I'm Alright.stem.mp4, samplerate=44100, channels=2, streams=5) 
+        # AudioFile(path=/home/bj/data/dnn/cfnet_venv/music_data/musdb18/test/AM Contra - Heart Peripheral.stem.mp4, samplerate=44100, channels=2, streams=5) 
+        # AudioFile(path=/home/bj/data/dnn/cfnet_venv/music_data/musdb18/train/Aimee Norwich - Child.stem.mp4, samplerate=44100, channels=2, streams=5) 
+        # AudioFile(path=/home/bj/data/dnn/cfnet_venv/music_data/musdb18/train/Actions - One Minute Smile.stem.mp4, samplerate=44100, channels=2, streams=5) 
+        streams = np.array(range(len(self)))[streams] # 5
         single = not isinstance(streams, np.ndarray)
-        if single:
-            streams = [streams]
+        if single: # True
+            streams = [streams] # list[array]
 
-        if duration is None:
+        if duration is None: # True
             target_size = None
             query_duration = None
         else:
@@ -123,7 +132,15 @@ class AudioFile:
                 if samplerate is not None:
                     command += ['-ar', str(samplerate)]
                 command += [filename]
-
+            # print(command)
+            # ['ffmpeg', '-y', '-loglevel', 'panic', '-i', '/home/bj/data/dnn/cfnet_venv/music_data/musdb18/train/Aimee Norwich - Child.stem.mp4', '-map', '0:0', '-threads', '1', '-f', 'f32le', '-ar', '44100', '/tmp/tmp0z3tq49w']
+            # ['ffmpeg', '-y', '-loglevel', 'panic', '-i', "/home/bj/data/dnn/cfnet_venv/music_data/musdb18/train/Actions - Devil's Words.stem.mp4", '-map', '0:0', '-threads', '1', '-f', 'f32le', '-ar', '44100', '/tmp/tmpjcmozil8']
+            # ['ffmpeg', '-y', '-loglevel', 'panic', '-i', '/home/bj/data/dnn/cfnet_venv/music_data/musdb18/train/Actions - One Minute Smile.stem.mp4', '-map', '0:0', '-threads', '1', '-f', 'f32le', '-ar', '44100', '/tmp/tmpoo837qy6']
+            # ['ffmpeg', '-y', '-loglevel', 'panic', '-i', '/home/bj/data/dnn/cfnet_venv/music_data/musdb18/test/Al James - Schoolboy Facination.stem.mp4', '-map', '0:0', '-threads', '1', '-f', 'f32le', '-ar', '44100', '/tmp/tmpqun54d8t']
+            # ['ffmpeg', '-y', '-loglevel', 'panic', '-i', '/home/bj/data/dnn/cfnet_venv/music_data/musdb18/train/A Classic Education - NightOwl.stem.mp4', '-map', '0:0', '-threads', '1', '-f', 'f32le', '-ar', '44100', '/tmp/tmpne2_2p_h']
+            # ['ffmpeg', '-y', '-loglevel', 'panic', '-i', "/home/bj/data/dnn/cfnet_venv/music_data/musdb18/test/Angels In Amplifiers - I'm Alright.stem.mp4", '-map', '0:0', '-threads', '1', '-f', 'f32le', '-ar', '44100', '/tmp/tmpuklyp0of']
+            # ['ffmpeg', '-y', '-loglevel', 'panic', '-i', '/home/bj/data/dnn/cfnet_venv/music_data/musdb18/test/AM Contra - Heart Peripheral.stem.mp4', '-map', '0:0', '-threads', '1', '-f', 'f32le', '-ar', '44100', '/tmp/tmpr22xumft']
+            # ['ffmpeg', '-y', '-loglevel', 'panic', '-i', '/home/bj/data/dnn/cfnet_venv/music_data/musdb18/train/Actions - South Of The Water.stem.mp4', '-map', '0:0', '-threads', '1', '-f', 'f32le', '-ar', '44100', '/tmp/tmpynagx7zr']            
             sp.run(command, check=True)
             wavs = []
             for filename in filenames:

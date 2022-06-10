@@ -238,7 +238,7 @@ def get_name(parser, args):
             continue
         if value != parser.get_default(name):
             if isinstance(value, Path):
-                parts.append(f"{name}={value.name}")
+                parts.append(f"{name}={value.name}") # value.name = 마지막경로 요소
             else:
                 parts.append(f"{name}={value}")
     if parts:
