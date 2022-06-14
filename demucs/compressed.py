@@ -31,6 +31,8 @@ class StemsSet:
             self.metadata.append(meta)
             if duration is not None and meta["duration"] < duration:
                 raise ValueError(f"Track {name} duration is too small {meta['duration']}")
+            print('name', name,'\n', path)
+            
         self.metadata.sort(key=lambda x: x["name"])
         self.duration = duration
         self.stride = stride
@@ -79,11 +81,14 @@ def _get_track_metadata(path):
 
 def _build_metadata(tracks, workers=10):
     pendings = []
-    with futures.ProcessPoolExecutor(workers) as pool:
-        for name, path in tracks.items():
-            pendings.append((name, pool.submit(_get_track_metadata, path)))
-    return {name: p.result() for name, p in pendings}
-
+    # with futures.ProcessPoolExecutor(workers) as pool:
+    #     for name, path in tracks.items():
+    #         pendings.append((name, pool.submit(_get_track_metadata, path)))
+    # return {name: p.result() for name, p in pendings}
+    for name, path in tracks.items():
+        pendings.append((name, _get_track_metadata(path)))
+    print('process pool executor end')        
+    return {name: p for name, p in pendings}
 
 def _build_musdb_metadata(path, musdb, workers):
     tracks = get_musdb_tracks(musdb)
@@ -99,8 +104,8 @@ def get_compressed_datasets(args, samples):
     if args.world_size > 1:
         distributed.barrier()
     metadata = json.load(open(metadata_file))
-    duration = Fraction(samples, args.samplerate)
-    stride = Fraction(args.data_stride, args.samplerate)
+    duration = Fraction(samples, args.samplerate) #111647/8820
+    stride = Fraction(args.data_stride, args.samplerate) #1
     train_set = StemsSet(get_musdb_tracks(args.musdb, subsets=["train"], split="train"),
                          metadata,
                          duration=duration,
