@@ -15,8 +15,7 @@ class Shift(nn.Module):
     """
     def __init__(self, shift=8192):
         super().__init__()
-        self.shift = shift
-
+        self.shift = shift #44100
     def forward(self, wav):
         batch, sources, channels, time = wav.size()
         length = time - self.shift

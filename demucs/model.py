@@ -155,16 +155,17 @@ class Demucs(nn.Module):
         For training, extracts should have a valid length.For evaluation
         on full tracks we recommend passing `pad = True` to :method:`forward`.
         """
-        if self.resample:
+
+        if self.resample: #True
             length *= 2
-        for _ in range(self.depth):
-            length = math.ceil((length - self.kernel_size) / self.stride) + 1
+        for _ in range(self.depth): # 6
+            length = math.ceil((length - self.kernel_size) / self.stride) + 1 # 8 / 4
             length = max(1, length)
-            length += self.context - 1
+            length += self.context - 1 # 3
         for _ in range(self.depth):
             length = (length - 1) * self.stride + self.kernel_size
 
-        if self.resample:
+        if self.resample: # True 
             length = math.ceil(length / 2)
         return int(length)
 

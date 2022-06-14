@@ -47,7 +47,7 @@ def get_parser():
                         default=44100,
                         type=int,
                         help="Stride for chunks, shorter = longer epochs")
-    parser.add_argument("-w", "--workers", default=10, type=int, help="Loader workers")
+    parser.add_argument("-w", "--workers", default=1, type=int, help="Loader workers") # dafault = 10
     parser.add_argument("--eval_workers", default=2, type=int, help="Final evaluation workers")
     parser.add_argument("-d",
                         "--device",

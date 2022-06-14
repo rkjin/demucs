@@ -227,12 +227,12 @@ def temp_filenames(count, delete=True):
 
 def get_quantizer(model, args, optimizer=None):
     quantizer = None
-    if args.diffq:
+    if args.diffq: # 0
         quantizer = DiffQuantizer(
             model, min_size=args.q_min_size, group_size=8)
-        if optimizer is not None:
+        if optimizer is not None: #Adam
             quantizer.setup_optimizer(optimizer)
-    elif args.qat:
+    elif args.qat: #None
         quantizer = UniformQuantizer(
                 model, bits=args.qat, min_size=args.q_min_size)
     return quantizer

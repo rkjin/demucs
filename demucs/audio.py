@@ -19,8 +19,276 @@ def _read_info(path):
         'ffprobe', "-loglevel", "panic",
         str(path), '-print_format', 'json', '-show_format', '-show_streams'
     ])
+#   print('start ########### \n',json.loads(stdout_data.decode('utf-8')))
+#  b'{
+#     "streams": [
+#                 {     "index": 0,
+#                       "codec_name": "aac",
+#                       "codec_long_name": "AAC (Advanced Audio Coding)",
+#                       "profile": "LC",
+#                       "codec_type": "audio",
+#                       "codec_time_base": "1/44100",
+#                       "codec_tag_string": "mp4a",
+#                       "codec_tag": "0x6134706d",
+#                       "sample_fmt": "fltp",
+#                       "sample_rate": "44100",
+#                       "channels": 2,
+#                       "channel_layout": "stereo",
+#                       "bits_per_sample": 0,
+#                       "r_frame_rate": "0/0",
+#                       "avg_frame_rate": "0/0",
+#                       "time_base": "1/44100",
+#                       "start_pts": 0,
+#                       "start_time": "0.000000",
+#                       "duration_ts": 8834421,
+#                       "duration": "200.327007",
+#                       "bit_rate": "256018",
+#                       "max_bit_rate": "267488",
+#                       "nb_frames": "8630",
+#                       "disposition": {
+#                                       "default": 1,
+#                                       "dub": 0,
+#                                       "original": 0,
+#                                       "comment": 0,
+#                                       "lyrics": 0,
+#                                       "karaoke": 0,
+#                                       "forced": 0,
+#                                       "hearing_impaired": 0,
+#                                       "visual_impaired": 0,
+#                                       "clean_effects": 0,
+#                                       "attached_pic": 0,
+#                                       "timed_thumbnails": 0
+#                                      },
+#     \n               "tags": {\n  
+#                               "language": "und",
+# \n                            "handler_name": "SoundHandler"
+# \n                            }\n  
+#                 },\n   
+#                 {     "index": 1,
+#                       "codec_name": "aac",
+#                       "codec_long_name": "AAC (Advanced Audio Coding)",
+#                       "profile": "LC",
+#                       "codec_type": "audio",
+#                       "codec_time_base": "1/44100",
+#                       "codec_tag_string": "mp4a",
+#                       "codec_tag": "0x6134706d",
+#                       "sample_fmt": "fltp",
+#                       "sample_rate": "44100",
+#                       "channels": 2,
+#                       "channel_layout": "stereo",
+#                       "bits_per_sample": 0,
+#                       "r_frame_rate": "0/0",
+#                       "avg_frame_rate": "0/0",
+#                       "time_base": "1/44100",
+#                       "start_pts": 0,
+#                       "start_time": "0.000000",
+#                       "duration_ts": 8834421,
+#                       "duration": "200.327007",
+#                       "bit_rate": "256018",
+#                       "max_bit_rate": "267488",
+#                       "nb_frames": "8630",
+#                       "disposition": {\n  
+#                                       "default": 0,
+#                                       "dub": 0,
+#                                       "original": 0,
+#                                       "comment": 0,
+#                                       "lyrics": 0,
+#                                       "karaoke": 0,
+#                                       "forced": 0,
+#                                       "hearing_impaired": 0,
+#                                       "visual_impaired": 0,
+#                                       "clean_effects": 0,
+#                                       "attached_pic": 0,
+#                                       "timed_thumbnails": 0
+#                                      },\n     
+#                       "tags": {              
+#                                 "language": "und",
+#                                 "handler_name": "SoundHandler"
+#                               }   
+#                  },\n      
+#                  {\n  "index": 2,
+#                       "codec_name": "aac",
+#                       "codec_long_name": "AAC (Advanced Audio Coding)",
+#                       "profile": "LC",
+#                       "codec_type": "audio",
+#                       "codec_time_base": "1/44100",
+#                       "codec_tag_string": "mp4a",
+#                       "codec_tag": "0x6134706d",
+#                       "sample_fmt": "fltp",
+#                       "sample_rate": "44100",
+#                       "channels": 2,
+#                       "channel_layout": "stereo",
+#                       "bits_per_sample": 0,
+#                       "r_frame_rate": "0/0",
+#                       "avg_frame_rate": "0/0",
+#                       "time_base": "1/44100",
+#                       "start_pts": 0,
+#                       "start_time": "0.000000",
+#                       "duration_ts": 8834421,
+#                       "duration": "200.327007",
+#                       "bit_rate": "256018",
+#                       "max_bit_rate": "267488",
+#                       "nb_frames": "8630",
+#                       "disposition": {\n   
+#                                       "default": 0,
+#                                       "dub": 0,
+#                                       "original": 0,
+#                                       "comment": 0,
+#                                       "lyrics": 0,
+#                                       "karaoke": 0,
+#                                       "forced": 0,
+#                                       "hearing_impaired": 0,
+#                                       "visual_impaired": 0,
+#                                       "clean_effects": 0,
+#                                       "attached_pic": 0,
+#                                       "timed_thumbnails": 0
+#                                      },\n         
+#                      "tags": {    
+#                               "language": "und",
+#                               "handler_name": "SoundHandler"
+#                              }  
+#                  },  
+#                  {\n  "index": 3,
+#                       "codec_name": "aac",
+#                       "codec_long_name": "AAC (Advanced Audio Coding)",
+#                       "profile": "LC",
+#                       "codec_type": "audio",
+#                       "codec_time_base": "1/44100",
+#                       "codec_tag_string": "mp4a",
+#                       "codec_tag": "0x6134706d",
+#                       "sample_fmt": "fltp",
+#                       "sample_rate": "44100",
+#                       "channels": 2,
+#                       "channel_layout": "stereo",
+#                       "bits_per_sample": 0,
+#                       "r_frame_rate": "0/0",
+#                       "avg_frame_rate": "0/0",
+#                       "time_base": "1/44100",
+#                       "start_pts": 0,
+#                       "start_time": "0.000000",
+#                       "duration_ts": 8834421,
+#                       "duration": "200.327007",
+#                       "bit_rate": "256018",
+#                       "max_bit_rate": "267488",
+#                       "nb_frames": "8630",
+#                       "disposition": {\n     
+#                                       "default": 0,
+#                                       "dub": 0,
+#                                       "original": 0,
+#                                       "comment": 0,
+#                                       "lyrics": 0,
+#                                       "karaoke": 0,
+#                                       "forced": 0,
+#                                       "hearing_impaired": 0,
+#                                       "visual_impaired": 0,
+#                                       "clean_effects": 0,
+#                                       "attached_pic": 0,
+#                                       "timed_thumbnails": 0
+#                                      },\n    
+#                       "tags": { 
+#                                  "language": "und",
+#                                  "handler_name": "SoundHandler"
+#                               }   
+#                  },   
+#                  {\n  "index": 4,
+#                       "codec_name": "aac",
+#                       "codec_long_name": "AAC (Advanced Audio Coding)",
+#                       "profile": "LC",
+#                       "codec_type": "audio",
+#                       "codec_time_base": "1/44100",
+#                       "codec_tag_string": "mp4a",
+#                       "codec_tag": "0x6134706d",
+#                       "sample_fmt": "fltp",
+#                       "sample_rate": "44100",
+#                       "channels": 2,
+#                       "channel_layout": "stereo",
+#                       "bits_per_sample": 0,
+#                       "r_frame_rate": "0/0",
+#                       "avg_frame_rate": "0/0",
+#                       "time_base": "1/44100",
+#                       "start_pts": 0,
+#                       "start_time": "0.000000",
+#                       "duration_ts": 8834421,
+#                       "duration": "200.327007",
+#                       "bit_rate": "256018",
+#                       "max_bit_rate": "267488",
+#                       "nb_frames": "8630",
+#                       "disposition": {                  
+#                                        "default": 0,
+#                                        "dub": 0,
+#                                        "original": 0,
+#                                        "comment": 0,
+#                                        "lyrics": 0,
+#                                        "karaoke": 0,
+#                                        "forced": 0,
+#                                        "hearing_impaired": 0,
+#                                        "visual_impaired": 0,
+#                                        "clean_effects": 0,
+#                                        "attached_pic": 0,
+#                                        "timed_thumbnails": 0
+#                                      },                    
+#                        "tags": {   "language": "und",
+#                                    "handler_name": "SoundHandler"
+#                                }          
+#                   },       
+#                   {\n "index": 5,
+#                       "codec_name": "png",
+#                       "codec_long_name": "PNG (Portable Network Graphics) image",
+#                       "codec_type": "video",
+#                       "codec_time_base": "0/1",
+#                       "codec_tag_string": "[0][0][0][0]",
+#                       "codec_tag": "0x0000",
+#                       "width": 512,
+#                       "height": 512,
+#                       "coded_width": 512,
+#                       "coded_height": 512,
+#                       "has_b_frames": 0,
+#                       "sample_aspect_ratio": "1:1",
+#                       "display_aspect_ratio": "1:1",
+#                       "pix_fmt": "rgba",
+#                       "level": -99,
+#                       "color_range": "pc",
+#                       "refs": 1,
+#                       "r_frame_rate": "90000/1",
+#                       "avg_frame_rate": "0/0",
+#                       "time_base": "1/90000",
+#                       "start_pts": 0,
+#                       "start_time": "0.000000",
+#                       "duration_ts": 18029430,
+#                       "duration": "200.327000",
+#                       "disposition": {  "default": 0,
+#                                         "dub": 0,
+#                                         "original": 0,
+#                                         "comment": 0,
+#                                         "lyrics": 0,
+#                                         "karaoke": 0,
+#                                         "forced": 0,
+#                                         "hearing_impaired": 0,
+#                                         "visual_impaired": 0,
+#                                         "clean_effects": 0,
+#                                         "attached_pic": 1,
+#                                         "timed_thumbnails": 0
+#                                       }                
+#                   }             
+#                 ],             
+#                 "format": {   "filename": "/home/bj/data/dnn/cfnet_venv/music_data/musdb18/test/Al James - Schoolboy Facination.stem.mp4",
+#                               "nb_streams": 6, 
+#                               "nb_programs": 0,
+#                               "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+#                               "format_long_name": "QuickTime / MOV",
+#                               "start_time": "0.000000",
+#                               "duration": "200.327000",
+#                               "size": "32262082",
+#                               "bit_rate": "1288376",
+#                               "probe_score": 100,
+#                               "tags": {  "major_brand": "isom",
+#                                          "minor_version": "1",
+#                                          "compatible_brands": "isom",
+#                                          "creation_time": "2017-12-16T16:25:40.000000Z"
+#                                       }\n 
+#                            }\
+#    }    
     return json.loads(stdout_data.decode('utf-8'))
-
 
 class AudioFile:
     """
@@ -57,7 +325,7 @@ class AudioFile:
         ]
 
     def __len__(self):
-        return len(self._audio_streams)
+        return len(self._audio_streams) #[0, 1, 2, 3, 4]
 
     def channels(self, stream=0):
         return int(self.info['streams'][self._audio_streams[stream]]['channels'])
@@ -105,10 +373,13 @@ class AudioFile:
         # AudioFile(path=/home/bj/data/dnn/cfnet_venv/music_data/musdb18/test/AM Contra - Heart Peripheral.stem.mp4, samplerate=44100, channels=2, streams=5) 
         # AudioFile(path=/home/bj/data/dnn/cfnet_venv/music_data/musdb18/train/Aimee Norwich - Child.stem.mp4, samplerate=44100, channels=2, streams=5) 
         # AudioFile(path=/home/bj/data/dnn/cfnet_venv/music_data/musdb18/train/Actions - One Minute Smile.stem.mp4, samplerate=44100, channels=2, streams=5) 
-        streams = np.array(range(len(self)))[streams] # 5
-        single = not isinstance(streams, np.ndarray)
+        # print(np.array(range(len(self)))) #[0 1 2 3 4]
+        # print(streams) #0
+        streams = np.array(range(len(self)))[streams]  
+        # print(streams) #0
+        single = not isinstance(streams, np.ndarray) # True
         if single: # True
-            streams = [streams] # list[array]
+            streams = [streams] # list[]
 
         if duration is None: # True
             target_size = None
@@ -116,8 +387,7 @@ class AudioFile:
         else:
             target_size = int((samplerate or self.samplerate()) * duration)
             query_duration = float((target_size + 1) / (samplerate or self.samplerate()))
-
-        with temp_filenames(len(streams)) as filenames:
+        with temp_filenames(len(streams)) as filenames: #'/tmp/tmpmt997s2i'
             command = ['ffmpeg', '-y']
             command += ['-loglevel', 'panic']
             if seek_time:
@@ -146,10 +416,10 @@ class AudioFile:
             for filename in filenames:
                 wav = np.fromfile(filename, dtype=np.float32)
                 wav = torch.from_numpy(wav)
-                wav = wav.view(-1, self.channels()).t()
-                if channels is not None:
+                wav = wav.view(-1, self.channels()).t() #([2, 7788544]) ....
+                if channels is not None: # 1
                     wav = convert_audio_channels(wav, channels)
-                if target_size is not None:
+                if target_size is not None: #false
                     wav = wav[..., :target_size]
                 wavs.append(wav)
         wav = torch.stack(wavs, dim=0)
@@ -160,10 +430,11 @@ class AudioFile:
 
 def convert_audio_channels(wav, channels=2):
     """Convert audio to the given number of channels."""
-    *shape, src_channels, length = wav.shape
-    if src_channels == channels:
+    
+    *shape, src_channels, length = wav.shape # ???????? *shape
+    if src_channels == channels: # 2 == 1?
         pass
-    elif channels == 1:
+    elif channels == 1: # True
         # Case 1:
         # The caller asked 1-channel audio, but the stream have multiple
         # channels, downmix all channels.
@@ -173,7 +444,7 @@ def convert_audio_channels(wav, channels=2):
         # The caller asked for multiple channels, but the input file have
         # one single channel, replicate the audio over all channels.
         wav = wav.expand(*shape, channels, length)
-    elif src_channels >= channels:
+    elif src_channels >= channels: #True
         # Case 3:
         # The caller asked for multiple channels, and the input file have
         # more channels than requested. In that case return the first channels.

@@ -120,18 +120,18 @@ def main():
             sources=SOURCES,
         )
     model.to(device)
-    if args.init: #None
+    if args.init: #None "Initialize from a pre-trained model."
         model.load_state_dict(load_pretrained(args.init).state_dict())
 
-    if args.show: #Fasle
+    if args.show: #Fasle "Show model architecture, size and exit"
         print(model)
         size = sizeof_fmt(4 * sum(p.numel() for p in model.parameters()))
         print(f"Model size {size}")
         return
 
-    try: #checkpoints/musdb=musdb18 batch_size=1.th
+    try: #checkpoints/musdb=musdb18 batch_size=1.th 
         saved = th.load(checkpoint, map_location='cpu')
-    except IOError:
+    except IOError: # True
         saved = SavedState()
 
     optimizer = th.optim.Adam(model.parameters(), lr=args.lr)
@@ -211,7 +211,7 @@ def main():
             valid_set = ConcatDataset([valid_set, mus_valid])
     elif args.is_wav: # False
         train_set, valid_set = get_musdb_wav_datasets(args, samples, model.sources)
-    else:
+    else: ###############################################################
         train_set, valid_set = get_compressed_datasets(args, samples)
     print("Train set and valid set sizes", len(train_set), len(valid_set))
 
@@ -232,14 +232,14 @@ def main():
               f"duration={human_seconds(metrics['duration'])}")
         best_loss = metrics['best']
 
-    if args.world_size > 1:
+    if args.world_size > 1: # ?
         dmodel = DistributedDataParallel(model,
                                          device_ids=[th.cuda.current_device()],
                                          output_device=th.cuda.current_device())
     else:
         dmodel = model
 
-    for epoch in range(len(saved.metrics), args.epochs):
+    for epoch in range(len(saved.metrics), args.epochs): #epoch default = 180
         begin = time.time()
         model.train()
         train_loss, model_size = train_model(
