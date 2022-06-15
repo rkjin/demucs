@@ -137,7 +137,7 @@ def main():
     optimizer = th.optim.Adam(model.parameters(), lr=args.lr)
 
     quantizer = None
-    quantizer = get_quantizer(model, args, optimizer)
+    quantizer = get_quantizer(model, args, optimizer) # None
 
     if saved.last_state is not None: #None
         model.load_state_dict(saved.last_state, strict=False)

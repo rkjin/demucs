@@ -22,16 +22,16 @@ def get_musdb_tracks(root, *args, **kwargs): # /home/bj/data/dnn/cfnet_venv/musi
 class StemsSet:
     def __init__(self, tracks, metadata, duration=None, stride=1,
                  samplerate=44100, channels=2, streams=slice(None)):
-
         self.metadata = []
         for name, path in tracks.items():
             meta = dict(metadata[name])
             meta["path"] = path
             meta["name"] = name
+            # print('meta \n',meta)
+            # [{'duration': 171.24, 'std': 0.15485107898712158, 'mean': 2.176033376599662e-05, 'path': '/home/bj/data/dnn/cfnet_venv/music_data/musdb18/train/A Classic Education - NightOwl.stem.mp4', 'name': 'A Classic Education - NightOwl'}]
             self.metadata.append(meta)
             if duration is not None and meta["duration"] < duration:
                 raise ValueError(f"Track {name} duration is too small {meta['duration']}")
-            print('name', name,'\n', path)
             
         self.metadata.sort(key=lambda x: x["name"])
         self.duration = duration
@@ -47,6 +47,7 @@ class StemsSet:
         if self.duration is None:
             return 1
         else:
+            
             return int((meta["duration"] - self.duration) // self.stride + 1)
 
     def track_metadata(self, index):
@@ -63,11 +64,14 @@ class StemsSet:
             if index >= examples:
                 index -= examples
                 continue
+            # print('getitem', index, examples, self.stride, self.duration, self.channels, self.samplerate, self.streams)
+            #                   125      159         1        111647/8820         2             44100       slice(1, None, None)
             streams = AudioFile(meta["path"]).read(seek_time=index * self.stride,
                                                    duration=self.duration,
                                                    channels=self.channels,
                                                    samplerate=self.samplerate,
-                                                   streams=self.streams)
+                                                   streams=self.streams) #torch.Size([4, 2, 558235])
+                                  
             return (streams - meta["mean"]) / meta["std"]
 
 
@@ -104,15 +108,17 @@ def get_compressed_datasets(args, samples):
     if args.world_size > 1:
         distributed.barrier()
     metadata = json.load(open(metadata_file))
-    duration = Fraction(samples, args.samplerate) #111647/8820
-    stride = Fraction(args.data_stride, args.samplerate) #1
+    duration = Fraction(samples, args.samplerate) # 558235 / 44100 -> 111647/8820
+    stride = Fraction(args.data_stride, args.samplerate) # 44100 / 44100 -> 1
+    
     train_set = StemsSet(get_musdb_tracks(args.musdb, subsets=["train"], split="train"),
                          metadata,
                          duration=duration,
-                         stride=stride,
+                         stride=stride, #1
                          streams=slice(1, None),
                          samplerate=args.samplerate,
-                         channels=args.audio_channels)
+                         channels=args.audio_channels) # 111647/8820 1 slice(1, None, None) 44100 2
+                  
     valid_set = StemsSet(get_musdb_tracks(args.musdb, subsets=["train"], split="valid"),
                          metadata,
                          samplerate=args.samplerate,
