@@ -40,7 +40,7 @@ def train_model(epoch,
         loader = DataLoader(dataset, batch_size=batch_size, num_workers=workers, shuffle=True)
     current_loss = 0
     model_size = 0
-    for repetition in range(repeat):
+    for repetition in range(repeat): # repeat = 2
         tq = tqdm.tqdm(loader,
                        ncols=120,
                        desc=f"[{epoch:03d}] train ({repetition + 1}/{repeat})",

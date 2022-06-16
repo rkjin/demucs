@@ -114,7 +114,7 @@ def get_compressed_datasets(args, samples):
     train_set = StemsSet(get_musdb_tracks(args.musdb, subsets=["train"], split="train"),
                          metadata,
                          duration=duration,
-                         stride=stride, #1
+                         stride=stride, 
                          streams=slice(1, None),
                          samplerate=args.samplerate,
                          channels=args.audio_channels) # 111647/8820 1 slice(1, None, None) 44100 2

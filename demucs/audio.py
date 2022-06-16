@@ -414,7 +414,7 @@ class AudioFile:
                 # ['ffmpeg', '-y', '-loglevel', 'panic', '-ss', '152', '-i', '/content/demucs/data/musdb18/train/Actions - South Of The Water.stem.mp4', '-map', '0:1', '-t', '11.13938775510204', '-threads', '1', '-f', 'f32le', '-ar', '44100', '/tmp/tmph45zn2n1', '-map', '0:2', '-t', '11.13938775510204', '-threads', '1', '-f', 'f32le', '-ar', '44100', '/tmp/tmpmojd1a8n', '-map', '0:3', '-t', '11.13938775510204', '-threads', '1', '-f', 'f32le', '-ar', '44100', '/tmp/tmpqme_11rp', '-map', '0:4', '-t', '11.13938775510204', '-threads', '1', '-f', 'f32le', '-ar', '44100', '/tmp/tmpf0jnff7f']
                 # seek_time 42
                 # ['ffmpeg', '-y', '-loglevel', 'panic', '-ss', '42', '-i', '/content/demucs/data/musdb18/train/A Classic Education - NightOwl.stem.mp4', '-map', '0:1', '-t', '11.13938775510204', '-threads', '1', '-f', 'f32le', '-ar', '44100', '/tmp/tmp0xy_bpad', '-map', '0:2', '-t', '11.13938775510204', '-threads', '1', '-f', 'f32le', '-ar', '44100', '/tmp/tmpeyjratgi', '-map', '0:3', '-t', '11.13938775510204', '-threads', '1', '-f', 'f32le', '-ar', '44100', '/tmp/tmpsd95m0ps', '-map', '0:4', '-t', '11.13938775510204', '-threads', '1', '-f', 'f32le', '-ar', '44100', '/tmp/tmp6vptg710']
-
+            sp.run(command, check=True)
             wavs = []
             for filename in filenames:
                 wav = np.fromfile(filename, dtype=np.float32)
