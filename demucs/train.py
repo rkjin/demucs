@@ -28,7 +28,7 @@ def train_model(epoch,
                 world_size=1,
                 batch_size=16):
 
-    if world_size > 1:
+    if world_size > 1: # False
         sampler = DistributedSampler(dataset)
         sampler_epoch = epoch * repeat
         if seed is not None:
@@ -36,7 +36,7 @@ def train_model(epoch,
         sampler.set_epoch(sampler_epoch)
         batch_size //= world_size
         loader = DataLoader(dataset, batch_size=batch_size, sampler=sampler, num_workers=workers)
-    else:
+    else: # True
         loader = DataLoader(dataset, batch_size=batch_size, num_workers=workers, shuffle=True)
     current_loss = 0
     model_size = 0

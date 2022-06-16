@@ -236,7 +236,7 @@ def main():
         dmodel = DistributedDataParallel(model,
                                          device_ids=[th.cuda.current_device()],
                                          output_device=th.cuda.current_device())
-    else:
+    else: #####################################################################
         dmodel = model
 
     for epoch in range(len(saved.metrics), args.epochs): #epoch default = 180
@@ -298,7 +298,7 @@ def main():
               f"cms={cms:.2f}MB "
               f"duration={human_seconds(duration)}")
 
-    if args.world_size > 1:
+    if args.world_size > 1: #False
         distributed.barrier()
 
     del dmodel

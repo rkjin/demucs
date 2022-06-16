@@ -105,8 +105,8 @@ def get_parser():
                         dest="augment",
                         default=True,
                         help="No basic data augmentation.")
-    parser.add_argument("--repitch", type=float, default=0.2,
-                        help="Probability to do tempo/pitch change")
+    parser.add_argument("--repitch", type=float, default=0,
+                        help="Probability to do tempo/pitch change") #default was 0.2
     parser.add_argument("--max_tempo", type=float, default=12,
                         help="Maximum relative tempo change in %% when using repitch.")
 
