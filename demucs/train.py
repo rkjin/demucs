@@ -48,22 +48,22 @@ def train_model(epoch,
                        file=sys.stdout,
                        unit=" batch")
         total_loss = 0
-        for idx, sources in enumerate(tq):
-            if len(sources) < batch_size:
+        for idx, sources in enumerate(tq): # source [4, 4, 2, 491246]
+            if len(sources) < batch_size: # 4 vs 4
                 # skip uncomplete batch for augment.Remix to work properly
                 continue
-            sources = sources.to(device)
-            sources = augment(sources)
-            mix = sources.sum(dim=1)
+            sources = sources.to(device) # [4, 4, 2, 491246]
+            sources = augment(sources) # [4, 4, 2, 447146]
+            mix = sources.sum(dim=1) #[4, 2, 447146])
 
-            estimates = model(mix)
-            sources = center_trim(sources, estimates)
-            loss = criterion(estimates, sources)
+            estimates = model(mix) # [4, 4, 2, 441686])
+            sources = center_trim(sources, estimates) #[4, 4, 2, 441686])
+            loss = criterion(estimates, sources) # train loss tensor(0.1155, device='cuda:0', grad_fn=<AddBackward0>)
             model_size = 0
-            if quantizer is not None:
+            if quantizer is not None: #False
                 model_size = quantizer.model_size()
 
-            train_loss = loss + diffq * model_size
+            train_loss = loss + diffq * model_size # model_size = 0
             train_loss.backward()
             grad_norm = 0
             for p in model.parameters():

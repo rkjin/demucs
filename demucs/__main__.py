@@ -186,7 +186,7 @@ def main():
     samples = model.valid_length(args.samples) # 441000 -> 447146
     print(f"Number of training samples adjusted to {samples}")
     samples = samples + args.data_stride # 447146 + 44100 -> 491246
-    if args.repitch: #0.2
+    if args.repitch: #0.2 -> 0
         # We need a bit more audio samples, to account for potential
         # tempo change.
         samples = math.ceil(samples / (1 - 0.01 * args.max_tempo)) # 491246 /(0.88) -> 558235
@@ -212,17 +212,17 @@ def main():
     elif args.is_wav: # False
         train_set, valid_set = get_musdb_wav_datasets(args, samples, model.sources)
     else: ###############################################################
-        train_set, valid_set = get_compressed_datasets(args, samples)
-    print("Train set and valid set sizes", len(train_set), len(valid_set))
+        train_set, valid_set = get_compressed_datasets(args, samples) #491246
+    print("Train set and valid set sizes", len(train_set), len(valid_set)) #691 , 1 ?????????????????????????????????????????
 
-    if args.repitch: #0.2
+    if args.repitch: #0.2 -> 0
         train_set = RepitchedWrapper(
             train_set,
             proba=args.repitch,
             max_tempo=args.max_tempo)
 
     best_loss = float("inf")
-    for epoch, metrics in enumerate(saved.metrics):
+    for epoch, metrics in enumerate(saved.metrics): #None
         print(f"Epoch {epoch:03d}: "
               f"train={metrics['train']:.8f} "
               f"valid={metrics['valid']:.8f} "

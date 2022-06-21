@@ -13,16 +13,16 @@ from .utils import capture_init, center_trim
 
 
 class BLSTM(nn.Module):
-    def __init__(self, dim, layers=1):
+    def __init__(self, dim, layers=1): # 2048, 2
         super().__init__()
         self.lstm = nn.LSTM(bidirectional=True, num_layers=layers, hidden_size=dim, input_size=dim)
         self.linear = nn.Linear(2 * dim, dim)
 
-    def forward(self, x):
-        x = x.permute(2, 0, 1)
-        x = self.lstm(x)[0]
-        x = self.linear(x)
-        x = x.permute(1, 2, 0)
+    def forward(self, x): #[4, 2048, 217]
+        x = x.permute(2, 0, 1) #[217, 4, 2048])
+        x = self.lstm(x)[0]# [217, 4, 4096])
+        x = self.linear(x)#[217, 4, 2048])
+        x = x.permute(1, 2, 0)#[4, 2048, 217])
         return x
 
 
@@ -104,17 +104,23 @@ class Demucs(nn.Module):
         self.encoder = nn.ModuleList()
         self.decoder = nn.ModuleList()
 
-        if glu:
+        if glu: #True
             activation = nn.GLU(dim=1)
             ch_scale = 2
         else:
             activation = nn.ReLU()
             ch_scale = 1
-        in_channels = audio_channels
-        for index in range(depth):
+        in_channels = audio_channels # 2
+        for index in range(depth): # 6
             encode = []
+            #  0                     2            64          8 4
+            #  1                    64           128          8 4
+            #  2                   128           256          8 4
+            #  3                   256           512          8 4
+            #  4                   512          1024          8 4
+            #  5                  1024          2048          8 4
             encode += [nn.Conv1d(in_channels, channels, kernel_size, stride), nn.ReLU()]
-            if rewrite:
+            if rewrite: # True
                 encode += [nn.Conv1d(channels, ch_scale * channels, 1), activation]
             self.encoder.append(nn.Sequential(*encode))
 
@@ -122,7 +128,7 @@ class Demucs(nn.Module):
             if index > 0:
                 out_channels = in_channels
             else:
-                out_channels = len(self.sources) * audio_channels
+                out_channels = len(self.sources) * audio_channels # 8, 64,128, 256, 512, 1024
             if rewrite:
                 decode += [nn.Conv1d(channels, ch_scale * channels, context), activation]
             decode += [nn.ConvTranspose1d(channels, out_channels, kernel_size, stride)]
@@ -134,8 +140,8 @@ class Demucs(nn.Module):
 
         channels = in_channels
 
-        if lstm_layers:
-            self.lstm = BLSTM(channels, lstm_layers)
+        if lstm_layers:  # 2
+            self.lstm = BLSTM(channels, lstm_layers) #ch 2048
         else:
             self.lstm = None
 
@@ -157,22 +163,35 @@ class Demucs(nn.Module):
         """
 
         if self.resample: #True
-            length *= 2
+            length *= 2 #882000
         for _ in range(self.depth): # 6
             length = math.ceil((length - self.kernel_size) / self.stride) + 1 # 8 / 4
             length = max(1, length)
             length += self.context - 1 # 3
+            # 0 220501
+            # 1 55127
+            # 2 13783
+            # 3 3447
+            # 4 863
+            # 5 217
+
         for _ in range(self.depth):
             length = (length - 1) * self.stride + self.kernel_size
-
+            # 0 872
+            # 1 3492
+            # 2 13972
+            # 3 55892
+            # 4 223572
+            # 5 894292
+ 
         if self.resample: # True 
-            length = math.ceil(length / 2)
+            length = math.ceil(length / 2) #447146
         return int(length)
 
     def forward(self, mix):
-        x = mix
+        x = mix #[4, 2, 447146]
 
-        if self.normalize:
+        if self.normalize:# False
             mono = mix.mean(dim=1, keepdim=True)
             mean = mono.mean(dim=-1, keepdim=True)
             std = mono.std(dim=-1, keepdim=True)
@@ -182,22 +201,33 @@ class Demucs(nn.Module):
 
         x = (x - mean) / (1e-5 + std)
 
-        if self.resample:
-            x = julius.resample_frac(x, 1, 2)
+        if self.resample:# True
+            x = julius.resample_frac(x, 1, 2) #([4, 2, 894292])
 
         saved = []
         for encode in self.encoder:
             x = encode(x)
             saved.append(x)
+            #  torch.Size([4, 64, 223572])
+            #  torch.Size([4, 128, 55892])
+            #  torch.Size([4, 256, 13972])
+            #  torch.Size([4, 512, 3492])
+            #  torch.Size([4, 1024, 872])
+            #  torch.Size([4, 2048, 217])
         if self.lstm:
-            x = self.lstm(x)
+            x = self.lstm(x) #[4, 2048, 217])
         for decode in self.decoder:
             skip = center_trim(saved.pop(-1), x)
             x = x + skip
             x = decode(x)
-
+            #  torch.Size([4, 1024, 864])
+            #  torch.Size([4, 512, 3452])
+            #  torch.Size([4, 256, 13804])
+            #  torch.Size([4, 128, 55212])
+            #  torch.Size([4, 64, 220844])
+            #  torch.Size([4, 8, 883372])
         if self.resample:
             x = julius.resample_frac(x, 2, 1)
         x = x * std + mean
-        x = x.view(x.size(0), len(self.sources), self.audio_channels, x.size(-1))
+        x = x.view(x.size(0), len(self.sources), self.audio_channels, x.size(-1)) # [4, 4, 2, 441686]
         return x
