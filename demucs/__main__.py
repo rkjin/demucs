@@ -44,7 +44,7 @@ def main():
     args = parser.parse_args()
     name = get_name(parser, args)
     print(f"Experiment {name}")
-
+    th.cuda.empty_cache() # GPU 캐시 데이터 삭제
     if args.musdb is None and args.rank == 0: #False
         print(
             "You must provide the path to the MusDB dataset with the --musdb flag. "
@@ -52,11 +52,11 @@ def main():
             file=sys.stderr)
         sys.exit(1)
 
-    eval_folder = args.evals / name  # evals/musdb=musdb18 batch_size=1 # evals # musdb=musdb18 batch_size=1 #
+    eval_folder = args.evals / name  # evals/musdb=musdb18  
     eval_folder.mkdir(exist_ok=True, parents=True)
     args.logs.mkdir(exist_ok=True) #logs
     metrics_path = args.logs / f"{name}.json" #logs/musdb=musdb18 batch_size=1.json
-    eval_folder.mkdir(exist_ok=True, parents=True)
+    # eval_folder.mkdir(exist_ok=True, parents=True) 중복
     args.checkpoints.mkdir(exist_ok=True, parents=True) #checkpoints
     args.models.mkdir(exist_ok=True, parents=True) #models
 
@@ -73,7 +73,7 @@ def main():
     os.environ["OMP_NUM_THREADS"] = "1"
     os.environ["MKL_NUM_THREADS"] = "1"
 
-    if args.world_size > 1: #Fasle
+    if args.world_size > 1: #Fasle defult = 1 GPU가 2개 이상이면...
         if device != "cuda" and args.rank == 0:
             print("Error: distributed training is only available with cuda device", file=sys.stderr)
             sys.exit(1)
@@ -102,29 +102,28 @@ def main():
                            sources=SOURCES)
     else:
         model = Demucs(
-            audio_channels=args.audio_channels,
-            channels=args.channels,
-            context=args.context,
-            depth=args.depth,
-            glu=args.glu,
-            growth=args.growth,
-            kernel_size=args.kernel_size,
-            lstm_layers=args.lstm_layers,
-            rescale=args.rescale,
-            rewrite=args.rewrite,
-            stride=args.conv_stride,
-            resample=args.resample,
-            normalize=args.normalize,
-            samplerate=args.samplerate,
-            segment_length=4 * args.samples,
-            sources=SOURCES,
+            audio_channels=args.audio_channels, #2
+            channels=args.channels,             # 64
+            context=args.context,               # 3 
+            depth=args.depth,                    # 6
+            glu=args.glu,                       # True
+            growth=args.growth,                 # 2
+            kernel_size=args.kernel_size,         # 8
+            lstm_layers=args.lstm_layers,       # 2
+            rescale=args.rescale,               # 0.1
+            rewrite=args.rewrite,               # true
+            stride=args.conv_stride,            # 4
+            resample=args.resample,             # true
+            normalize=args.normalize,           # action true
+            samplerate=args.samplerate,         # 44100
+            segment_length=4 * args.samples,    # 44100 * 10
+            sources=SOURCES,                    # ["drums", "bass", "other", "vocals"]
         )
     model.to(device)
     if args.init: #None "Initialize from a pre-trained model."
         model.load_state_dict(load_pretrained(args.init).state_dict())
 
     if args.show: #Fasle "Show model architecture, size and exit"
-        print(model)
         size = sizeof_fmt(4 * sum(p.numel() for p in model.parameters()))
         print(f"Model size {size}")
         return
@@ -170,7 +169,7 @@ def main():
     augment = [Shift(args.data_stride)] # args.data_stride 44100
     if args.augment: #True
         augment += [FlipSign(), FlipChannels(), Scale(),
-                    Remix(group_size=args.remix_group_size)]
+                    Remix(group_size=args.remix_group_size)] #4
     augment = nn.Sequential(*augment).to(device)
     print("Agumentation pipeline:", augment)
 

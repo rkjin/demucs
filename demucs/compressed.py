@@ -32,37 +32,27 @@ class StemsSet:
             self.metadata.append(meta)
             if duration is not None and meta["duration"] < duration:
                 raise ValueError(f"Track {name} duration is too small {meta['duration']}")
-            
-        self.metadata.sort(key=lambda x: x["name"]) #
-        # A Classic Education - NightOwl /content/demucs/data/musdb18/train/A Classic Education - NightOwl.stem.mp4
-        # Actions - Devil's Words /content/demucs/data/musdb18/train/Actions - Devil's Words.stem.mp4
-        # Actions - South Of The Water /content/demucs/data/musdb18/train/Actions - South Of The Water.stem.mp4
-        # Aimee Norwich - Child /content/demucs/data/musdb18/train/Aimee Norwich - Child.stem.mp4
-        # [{'duration': 171.24, 'std': 0.15485107898712158, 'mean': 2.176033376599662e-05, 'path': '/content/demucs/data/musdb18/train/A Classic Education - NightOwl.stem.mp4', 'name': 'A Classic Education - NightOwl'}, {'duration': 196.608, 'std': 0.14958864450454712, 'mean': 0.0003039466100744903, 'path': "/content/demucs/data/musdb18/train/Actions - Devil's Words.stem.mp4", 'name': "Actions - Devil's Words"}, {'duration': 176.603, 'std': 0.13618549704551697, 'mean': -0.0005381310475058854, 'path': '/content/demucs/data/musdb18/train/Actions - South Of The Water.stem.mp4', 'name': 'Actions - South Of The Water'}, {'duration': 189.07, 'std': 0.14917349815368652, 'mean': -0.000972075795289129, 'path': '/content/demucs/data/musdb18/train/Aimee Norwich - Child.stem.mp4', 'name': 'Aimee Norwich - Child'}] 
+            #self.metadata [{'duration': 171.24, 'std': 0.15485107898712158, 'mean': 2.176033376599662e-05, 'path': '/home/bj/data/dnn/cfnet_venv/music_data/musdb18/train/A Classic Education - NightOwl.stem.mp4', 'name': 'A Classic Education - NightOwl'}, {'duration': 196.608, 'std': 0.14958864450454712, 'mean': 0.0003039466100744903, 'path': "/home/bj/data/dnn/cfnet_venv/music_data/musdb18/train/Actions - Devil's Words.stem.mp4", 'name': "Actions - Devil's Words"}, {'duration': 176.603, 'std': 0.13618549704551697, 'mean': -0.0005381310475058854, 'path': '/home/bj/data/dnn/cfnet_venv/music_data/musdb18/train/Actions - South Of The Water.stem.mp4', 'name': 'Actions - South Of The Water'}, {'duration': 189.07, 'std': 0.14917349815368652, 'mean': -0.000972075795289129, 'path': '/home/bj/data/dnn/cfnet_venv/music_data/musdb18/train/Aimee Norwich - Child.stem.mp4', 'name': 'Aimee Norwich - Child'}]
 
-        # Actions - One Minute Smile /content/demucs/data/musdb18/train/Actions - One Minute Smile.stem.mp4
-        # [{'duration': 163.372, 'std': 0.13281762599945068, 'mean': 0.00022074741718824953, 'path': '/content/demucs/data/musdb18/train/Actions - One Minute Smile.stem.mp4', 'name': 'Actions - One Minute Smile'}] 
-
-        self.duration = duration # 35089/3150 
+        self.metadata.sort(key=lambda x: x["name"]) # list.sort 
+        self.duration = duration # 35089/3150 , 두번째 None
         self.stride = stride # 1
         self.channels = channels # 2
         self.samplerate = samplerate # 44100
-        self.streams = streams # slice(1, None, None),  slice(None, None, None) 
-
+        self.streams = streams # slice(1, None, None)  , 두번째 slice(None, None, None) None 은 전체
     def __len__(self):
-        return sum(self._examples_count(m) for m in self.metadata)
+        return sum(self._examples_count(m) for m in self.metadata) #691
 
     def _examples_count(self, meta):
         if self.duration is None:
             return 1
         else:
-            
             return int((meta["duration"] - self.duration) // self.stride + 1)
 
     def track_metadata(self, index):
         for meta in self.metadata:
             examples = self._examples_count(meta)
-            
+
             if index >= examples:
                 index -= examples
                 continue
@@ -75,7 +65,6 @@ class StemsSet:
         # {'duration': 196.608, 'std': 0.14958864450454712, 'mean': 0.0003039466100744903, 'path': "/content/demucs/data/musdb18/train/Actions - Devil's Words.stem.mp4", 'name': "Actions - Devil's Words"}
         # {'duration': 176.603, 'std': 0.13618549704551697, 'mean': -0.0005381310475058854, 'path': '/content/demucs/data/musdb18/train/Actions - South Of The Water.stem.mp4', 'name': 'Actions - South Of The Water'}
         # {'duration': 189.07, 'std': 0.14917349815368652, 'mean': -0.000972075795289129, 'path': '/content/demucs/data/musdb18/train/Aimee Norwich - Child.stem.mp4', 'name': 'Aimee Norwich - Child'}
-
             examples = self._examples_count(meta) # 161, 186, 166, 178
             if index >= examples: # 545, 384, 198, 32
                 index -= examples
@@ -86,7 +75,7 @@ class StemsSet:
                                                    samplerate=self.samplerate, # 44100
                                                    streams=self.streams) # slice[1, None, none]
             # streams torch.Size([4, 2, 491246])                       
-            return (streams - meta["mean"]) / meta["std"]
+            return (streams - meta["mean"]) / meta["std"] #normalize
 
 
 def _get_track_metadata(path):

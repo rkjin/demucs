@@ -43,40 +43,32 @@ def rescale_module(module, reference):
 class Demucs(nn.Module):
     @capture_init
     def __init__(self,
-                 sources,
-                 audio_channels=2,
-                 channels=64,
-                 depth=6,
-                 rewrite=True,
-                 glu=True,
-                 rescale=0.1,
-                 resample=True,
-                 kernel_size=8,
-                 stride=4,
-                 growth=2.,
-                 lstm_layers=2,
-                 context=3,
-                 normalize=False,
-                 samplerate=44100,
-                 segment_length=4 * 10 * 44100):
+                 sources,                  # list of source names ["drums", "bass", "other", "vocals"]
+                 audio_channels=2,         # stereo or mono 2
+                 channels=64,              # first convolution channels 64
+                 depth=6,                  # number of encoder/decoder layers 6
+                 rewrite=True,             # true
+                 glu=True,                 # use glu instead of ReLU True 
+                 rescale=0.1,              # 0.1
+                 resample=True,            # upsample x2 the input and downsample /2 the output. true
+                 kernel_size=8,            # kernel size for convolutions 8
+                 stride=4,                 # stride for convolutions 4
+                 growth=2.,                # 2
+                 lstm_layers=2,            # number of lstm layers, 0 = no lstm 2
+                 context=3,                # 3 
+                 normalize=False,          # action true
+                 samplerate=44100,         # 44100
+                 segment_length=4 * 10 * 44100):# 44100 * 10
+
         """
         Args:
-            sources (list[str]): list of source names
-            audio_channels (int): stereo or mono
-            channels (int): first convolution channels
-            depth (int): number of encoder/decoder layers
             rewrite (bool): add 1x1 convolution to each encoder layer
                 and a convolution to each decoder layer.
                 For the decoder layer, `context` gives the kernel size.
-            glu (bool): use glu instead of ReLU
-            resample_input (bool): upsample x2 the input and downsample /2 the output.
             rescale (int): rescale initial weights of convolutions
                 to get their standard deviation closer to `rescale`
-            kernel_size (int): kernel size for convolutions
-            stride (int): stride for convolutions
             growth (float): multiply (resp divide) number of channels by that
                 for each layer of the encoder (resp decoder)
-            lstm_layers (int): number of lstm layers, 0 = no lstm
             context (int): kernel size of the convolution in the
                 decoder before the transposed convolution. If > 1,
                 will provide some context from neighboring time
@@ -147,7 +139,7 @@ class Demucs(nn.Module):
 
         if rescale:
             rescale_module(self, reference=rescale)
-
+        print(self.normalize)
     def valid_length(self, length):
         """
         Return the nearest valid length to use with the model so that
@@ -190,7 +182,6 @@ class Demucs(nn.Module):
 
     def forward(self, mix):
         x = mix #[4, 2, 447146]
-
         if self.normalize:# False
             mono = mix.mean(dim=1, keepdim=True)
             mean = mono.mean(dim=-1, keepdim=True)

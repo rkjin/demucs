@@ -17,16 +17,11 @@ def get_parser():
         default_raw = Path(os.environ['DEMUCS_RAW'])
     if 'DEMUCS_MUSDB' in os.environ:
         default_musdb = Path(os.environ['DEMUCS_MUSDB'])
-    parser.add_argument(
-        "--raw",
-        type=Path,
-        default=default_raw,
+    parser.add_argument("--raw", type=Path, default=default_raw,
         help="Path to raw audio, can be faster, see python3 -m demucs.raw to extract.")
     parser.add_argument("--no_raw", action="store_const", const=None, dest="raw")
-    parser.add_argument("-m",
-                        "--musdb",
-                        type=Path,
-                        default="/content/demucs/data/musdb18",
+    parser.add_argument("-m","--musdb", type=Path,
+                        default="/home/bj/data/dnn/cfnet_venv/music_data/musdb18",
                         help="Path to musdb root")
     parser.add_argument("--is_wav", action="store_true",
                         help="Indicate that the MusDB dataset is in wav format (i.e. MusDB-HQ).")
@@ -94,7 +89,7 @@ def get_parser():
                         type=int,
                         default=2,
                         help="Repeat the train set, longer epochs")
-    parser.add_argument("-b", "--batch_size", type=int, default=64)
+    parser.add_argument("-b", "--batch_size", type=int, default=1)
     parser.add_argument("--lr", type=float, default=3e-4)
     parser.add_argument("--mse", action="store_true", help="Use MSE instead of L1")
     parser.add_argument("--init", help="Initialize from a pre-trained model.")
@@ -237,12 +232,12 @@ def get_name(parser, args):
         if name in ignore_args:
             continue
         if value != parser.get_default(name):
-            if isinstance(value, Path):
-                parts.append(f"{name}={value.name}") # value.name = 마지막경로 요소
+            if isinstance(value, Path): #Path 는 pathlib path
+                parts.append(f"{name}={value.name}") # value는 class pathlib.PosixPath value.name = 마지막경로 요소
             else:
                 parts.append(f"{name}={value}")
     if parts:
-        name = " ".join(parts)
+        name = " ".join(parts) # parts list 성분을 한칸띄어 붙이기
     else:
         name = "default"
     return name

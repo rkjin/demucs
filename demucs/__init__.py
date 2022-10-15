@@ -5,3 +5,4 @@
 # LICENSE file in the root directory of this source tree.
 
 __version__ = "2.0.3"
+print('init.py')

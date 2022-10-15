@@ -319,10 +319,8 @@ class AudioFile:
 
     @property
     def _audio_streams(self):
-        return [
-            index for index, stream in enumerate(self.info["streams"])
-            if stream["codec_type"] == "audio"
-        ]
+        return [index for index, stream in enumerate(self.info["streams"])
+                                        if stream["codec_type"] == "audio"]
 
     def __len__(self):
         return len(self._audio_streams) #[0, 1, 2, 3, 4]
@@ -374,17 +372,20 @@ class AudioFile:
         # AudioFile(path=/home/bj/data/dnn/cfnet_venv/music_data/musdb18/train/Aimee Norwich - Child.stem.mp4, samplerate=44100, channels=2, streams=5) 
         # AudioFile(path=/home/bj/data/dnn/cfnet_venv/music_data/musdb18/train/Actions - One Minute Smile.stem.mp4, samplerate=44100, channels=2, streams=5) 
         # print(np.array(range(len(self)))) #[0 1 2 3 4]
-        # print(streams) #0
-        streams = np.array(range(len(self)))[streams]  
-        # print(streams) #0
-        single = not isinstance(streams, np.ndarray) # True
-        if single: # True
+        # print(streams) # slice(1, None, None)
+        # print(len(self)) 5
+        streams = np.array(range(len(self)))[streams]
+        # print(streams.shape) # (4,)
+        # print(type(streams)) numpy.ndarray
+        single = not isinstance(streams, np.ndarray) # False
+        print(single,duration,samplerate)
+        if single: # False
             streams = [streams] # list[]
 
-        if duration is None: # True
+        if duration is None: # 35089/3150
             target_size = None
             query_duration = None
-        else:
+        else: # True            sr 44100 
             target_size = int((samplerate or self.samplerate()) * duration)
             query_duration = float((target_size + 1) / (samplerate or self.samplerate()))
         with temp_filenames(len(streams)) as filenames: #'/tmp/tmpmt997s2i'

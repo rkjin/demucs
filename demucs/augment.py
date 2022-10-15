@@ -70,7 +70,7 @@ class Remix(nn.Module):
         performance.
         """
         super().__init__()
-        self.group_size = group_size
+        self.group_size = 1 #group_size #4
 
     def forward(self, wav):
         batch, streams, channels, time = wav.size()
